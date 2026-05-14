@@ -12,9 +12,7 @@ Obsidian과 함께 쓰도록 설계되었으며, AI 코딩 에이전트(Codex, C
 ├── output/                # 쿼리 결과물 staging
 └── wiki/                  # LLM이 관리하는 지식 베이스
     ├── _master-index.md   # 전체 진입점
-    ├── _template.md       # article 템플릿
-    └── sample-topic/      # 주제 폴더 예시
-        └── _index.md      # 폴더 내 article 목록
+    └── _template.md       # article 템플릿
 ```
 
 ## 시작하기
