@@ -17,20 +17,13 @@ Obsidian과 함께 쓰도록 설계되었으며, AI 코딩 에이전트(Codex, C
 
 ## 시작하기
 
-### 1. 레포 복제
-
 ```bash
 git clone https://github.com/MARKZZAM/llm-wiki-template.git my-wiki
 cd my-wiki
 rm -rf .git && git init   # 히스토리 초기화
 ```
 
-### 2. raw/에 소스 넣기
-
-정리할 자료를 `raw/`에 넣습니다.
-
-- 웹 클리핑, 논문, 대화록, 노트, 이미지 등 무엇이든
-- **raw/는 불변** — 삭제·수정·이름변경 금지
+이제 `raw/`에 소스를 넣고 에이전트에게 컴파일을 요청하세요. 아래 워크플로우를 참고.
 
 #### Obsidian Web Clipper로 웹 클리핑하기
 
@@ -57,55 +50,102 @@ rm -rf .git && git init   # 히스토리 초기화
 
 **고급**: 특정 사이트별로 다른 템플릿을 적용하려면 설정 → **Smart Triggers**에서 URL 패턴별 규칙을 추가하세요.
 
-### 3. 에이전트에게 컴파일 요청
+## 워크플로우
 
-AI 코딩 에이전트에게 아래 명령을 전달하세요:
+LLM Wiki는 세 가지 영역(`raw/` → `wiki/` → `output/`)을 순환하며 지식이 축적됩니다.
+
+```
+웹 클리핑 / 노트 / 논문
+        │
+        ▼
+    ┌───────┐   compile    ┌───────┐   query    ┌──────────┐
+    │ raw/  │ ──────────▶ │ wiki/ │ ─────────▶ │  답변     │
+    │       │              │       │            │  분석     │
+    └───────┘              └───────┘            └────┬─────┘
+       ▲                       ▲                      │
+       │                       │ output compile       │ 저장
+       │                  ┌────┴─────┐                ▼
+       │                  │ output/  │ ◀────────────────
+       │                  └──────────┘
+       │
+       └─── 새로운 소스 추가 ─── 계속 반복
+```
+
+### 1. 수집 → raw/
+
+소스 자료를 `raw/`에 넣습니다. 웹 클리핑, 논문, 대화록, 노트, 이미지 등 무엇이든 가능.
+
+**raw/는 불변** — 삭제·수정·이름변경 금지.
+
+#### 웹 클리핑: Obsidian Web Clipper
+
+[Obsidian Web Clipper](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)를 사용하면 웹 페이지를 Markdown으로 바로 클리핑할 수 있습니다. (Firefox, Safari, Edge도 지원)
+
+**설정**:
+
+1. 확장 프로그램 설치 후 설정(⚙) 클릭
+2. **Vault** 항목에서 LLM Wiki 폴더(Obsidian vault) 선택
+3. **기본 템플릿**의 저장 폴더를 `raw/`로 변경 (기본값은 `Clippings`)
+4. 템플릿에서 `{{content}}` 변수가 본문을 담당 — 필요시 frontmatter에 `title`, `source`, `tags` 등 추가 가능
+
+**사용법**:
+
+| 동작 | 방법 |
+|------|------|
+| 전체 페이지 클리핑 | 확장 프로그램 아이콘 클릭 → "Obsidian에 추가" |
+| 일부만 클리핑 | 펜 아이콘 클릭 → 원하는 텍스트 드래그로 하이라이트 → "Obsidian에 추가" |
+| 단축키로 빠른 클리핑 | `Ctrl+Shift+O` (기본값, 변경 가능) |
+
+클리핑된 Markdown 파일이 `raw/`에 저장되고, 컴파일 시 wiki article로 통합됩니다.
+
+**고급**: 특정 사이트별로 다른 템플릿을 적용하려면 설정 → **Smart Triggers**에서 URL 패턴별 규칙을 추가하세요.
+
+### 2. 컴파일 → wiki/
+
+AI 코딩 에이전트에게 컴파일을 요청합니다:
 
 ```
 컴파일해줘
 ```
 
-에이전트가 `AGENTS.md`를 읽고:
-- `raw/`의 미처리 파일을 식별
-- 주제별 wiki article 작성
-- `_index.md`, `_master-index.md` 갱신
-- 관련 문서 간 `[[wiki links]]` 연결
+에이전트가 `AGENTS.md`를 읽고 다음을 수행합니다:
 
-## 사용법
+1. `_master-index.md`의 Compiled Sources와 `raw/`를 비교하여 미처리 파일 식별
+2. 소스 내용 분석 → 주제별 topic folder 자동 생성
+3. wiki article 작성 (단순 요약이 아닌 재구성)
+4. 관련 문서 간 `[[wiki links]]` 연결
+5. `_index.md`, `_master-index.md` 갱신
+6. 처리 완료된 raw 파일을 Compiled Sources에 등록
 
-### 컴파일 (raw → wiki)
+### 3. 질의 → 답변
 
-```
-컴파일해줘
-```
-
-`raw/`에 새 파일이 있으면 wiki article로 통합합니다.
-
-### 질의
+wiki에 축적된 지식을 자연어로 질의합니다:
 
 ```
-창세기 1장 창조의 의미는?
+RAG 시스템에서 벡터 DB 없이 구축하는 방법이 있나?
 ```
 
-에이전트가 `_master-index.md` → `_index.md` → article 순으로 탐색하여 답변합니다. 답변에는 `[[wiki-link]]` 형태로 출처가 인용됩니다.
+에이전트가 `_master-index.md` → `_index.md` → article 순으로 탐색하여 답변합니다. 답변에는 출처가 `[[wiki-link]]` 형태로 인용됩니다.
 
-### 결과물 저장 (대화 → output)
+### 4. 대화 결과물 → output/
+
+대화 중 축적된 인사이트나 분석을 저장합니다:
 
 ```
 output에 저장해
 ```
 
-대화 중 나온 인사이트나 분석을 `output/`에 저장합니다.
+### 5. output 승격 → wiki/
 
-### Output 승격 (output → wiki)
+output 중 장기 가치가 있는 것을 wiki로 승격합니다:
 
 ```
 output compile해줘
 ```
 
-`output/`의 파일을 평가하여 재사용 가치가 있는 것을 wiki로 승격합니다.
+에이전트가 각 output 파일을 평가하여 승격/보류/삭제를 판단합니다.
 
-### 정합성 검사
+### 6. 정합성 검사
 
 ```
 audit해줘
@@ -118,7 +158,7 @@ audit해줘
 | 항목 | 규칙 |
 |------|------|
 | 언어 | 한국어 기본, 기술 용어는 영어 |
-| 파일명 | 한국어 + 하이픈 (`창세기-1장-주석.md`) |
+| 파일명 | 한국어 + 하이픈 (`AI-에이전트-비교.md`) |
 | Tags | kebab-case (`AI-코딩`, `RAG`) |
 | Wiki Links | `[[파일명]]` (Obsidian 스타일) |
 | raw 참조 | `[[raw/원본파일명.확장자]]` |
