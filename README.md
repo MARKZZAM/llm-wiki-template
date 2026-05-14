@@ -32,6 +32,14 @@ rm -rf .git && git init   # 히스토리 초기화
 - 웹 클리핑, 논문, 대화록, 노트, 이미지 등 무엇이든
 - **raw/는 불변** — 삭제·수정·이름변경 금지
 
+**웹 클리핑 추천**: [Obsidian Web Clipper](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)를 사용하면 웹 페이지를 Markdown으로 바로 클리핑할 수 있습니다.
+
+1. Chrome 확장 프로그램 설치
+2. 설정에서 저장 폴더를 `raw/`로 지정
+3. 웹 페이지에서 확장 프로그램 아이콘 클릭 → 클리핑
+
+클리핑된 파일이 자동으로 `raw/`에 들어가고, 컴파일 시 wiki article로 통합됩니다.
+
 ### 3. 에이전트에게 컴파일 요청
 
 AI 코딩 에이전트에게 아래 명령을 전달하세요:
