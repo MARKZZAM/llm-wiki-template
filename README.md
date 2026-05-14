@@ -1,18 +1,20 @@
 # LLM Wiki Template
 
-LLM 에이전트가 유지보수하는 지식 베이스 스켈레톤.
+LLM 에이전트가 유지보수하는 LLM Wiki 템플릿.
 
 Obsidian과 함께 쓰도록 설계되었으며, AI 코딩 에이전트(Codex, Claude Code, OpenCode 등)가 `AGENTS.md`를 읽고 지식 베이스를 자동으로 관리합니다.
 
 ## 구조
 
 ```
-├── AGENTS.md              # 에이전트 지시사항 (핵심)
-├── raw/                   # 소스 자료 inbox (불변)
-├── output/                # 쿼리 결과물 staging
-└── wiki/                  # LLM이 관리하는 지식 베이스
-    ├── _master-index.md   # 전체 진입점
-    └── _template.md       # article 템플릿
+├── AGENTS.md                  # 에이전트 지시사항 (핵심)
+├── raw/                       # 소스 자료 inbox (불변)
+├── output/                    # 쿼리 결과물 staging
+└── wiki/                      # LLM이 관리하는 지식 베이스
+    ├── _master-index.md       # 전체 진입점
+    ├── _compiled-sources.md   # raw 컴파일 이력
+    ├── _compiled-outputs.md   # output 컴파일 이력
+    └── _template.md           # article 템플릿
 ```
 
 ## 시작하기
@@ -24,31 +26,6 @@ rm -rf .git && git init   # 히스토리 초기화
 ```
 
 이제 `raw/`에 소스를 넣고 에이전트에게 컴파일을 요청하세요. 아래 워크플로우를 참고.
-
-#### Obsidian Web Clipper로 웹 클리핑하기
-
-웹 페이지를 Markdown으로 바로 클리핑할 수 있는 공식 확장 프로그램입니다.
-
-**설치**: [Chrome 웹 스토어](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf) (Firefox, Safari, Edge도 지원)
-
-**설정**:
-
-1. 확장 프로그램 설치 후 설정(⚙) 클릭
-2. **Vault** 항목에서 LLM Wiki 폴더( Obsidian vault) 선택
-3. **기본 템플릿**의 저장 폴더를 `raw/`로 변경 (기본값은 `Clippings`)
-4. 템플릿에서 `{{content}}` 변수가 본문을 담당 — 필요시 frontmatter에 `title`, `source`, `tags` 등 추가 가능
-
-**사용법**:
-
-| 동작 | 방법 |
-|------|------|
-| 전체 페이지 클리핑 | 확장 프로그램 아이콘 클릭 → "Obsidian에 추가" |
-| 일부만 클리핑 | 펜 아이콘 클릭 → 원하는 텍스트 드래그로 하이라이트 → "Obsidian에 추가" |
-| 단축키로 빠른 클리핑 | `Ctrl+Shift+O` (기본값, 변경 가능) |
-
-클리핑된 Markdown 파일이 `raw/`에 저장되고, 컴파일 시 wiki article로 통합됩니다.
-
-**고급**: 특정 사이트별로 다른 템플릿을 적용하려면 설정 → **Smart Triggers**에서 URL 패턴별 규칙을 추가하세요.
 
 ## 워크플로우
 
@@ -77,28 +54,7 @@ LLM Wiki는 세 가지 영역(`raw/` → `wiki/` → `output/`)을 순환하며 
 
 **raw/는 불변** — 삭제·수정·이름변경 금지.
 
-#### 웹 클리핑: Obsidian Web Clipper
-
-[Obsidian Web Clipper](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)를 사용하면 웹 페이지를 Markdown으로 바로 클리핑할 수 있습니다. (Firefox, Safari, Edge도 지원)
-
-**설정**:
-
-1. 확장 프로그램 설치 후 설정(⚙) 클릭
-2. **Vault** 항목에서 LLM Wiki 폴더(Obsidian vault) 선택
-3. **기본 템플릿**의 저장 폴더를 `raw/`로 변경 (기본값은 `Clippings`)
-4. 템플릿에서 `{{content}}` 변수가 본문을 담당 — 필요시 frontmatter에 `title`, `source`, `tags` 등 추가 가능
-
-**사용법**:
-
-| 동작 | 방법 |
-|------|------|
-| 전체 페이지 클리핑 | 확장 프로그램 아이콘 클릭 → "Obsidian에 추가" |
-| 일부만 클리핑 | 펜 아이콘 클릭 → 원하는 텍스트 드래그로 하이라이트 → "Obsidian에 추가" |
-| 단축키로 빠른 클리핑 | `Ctrl+Shift+O` (기본값, 변경 가능) |
-
-클리핑된 Markdown 파일이 `raw/`에 저장되고, 컴파일 시 wiki article로 통합됩니다.
-
-**고급**: 특정 사이트별로 다른 템플릿을 적용하려면 설정 → **Smart Triggers**에서 URL 패턴별 규칙을 추가하세요.
+웹 클리핑은 [Obsidian Web Clipper](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf) 사용 권장. 저장 폴더를 `raw/`로 설정하면 바로 inbox로 들어감.
 
 ### 2. 컴파일 → wiki/
 
@@ -110,12 +66,12 @@ AI 코딩 에이전트에게 컴파일을 요청합니다:
 
 에이전트가 `AGENTS.md`를 읽고 다음을 수행합니다:
 
-1. `_master-index.md`의 Compiled Sources와 `raw/`를 비교하여 미처리 파일 식별
+1. `_compiled-sources.md`와 `raw/`를 비교하여 미처리 파일 식별
 2. 소스 내용 분석 → 주제별 topic folder 자동 생성
 3. wiki article 작성 (단순 요약이 아닌 재구성)
 4. 관련 문서 간 `[[wiki links]]` 연결
 5. `_index.md`, `_master-index.md` 갱신
-6. 처리 완료된 raw 파일을 Compiled Sources에 등록
+6. 처리 완료된 raw 파일을 `_compiled-sources.md`에 등록
 
 ### 3. 질의 → 답변
 
