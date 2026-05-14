@@ -32,13 +32,30 @@ rm -rf .git && git init   # 히스토리 초기화
 - 웹 클리핑, 논문, 대화록, 노트, 이미지 등 무엇이든
 - **raw/는 불변** — 삭제·수정·이름변경 금지
 
-**웹 클리핑 추천**: [Obsidian Web Clipper](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)를 사용하면 웹 페이지를 Markdown으로 바로 클리핑할 수 있습니다.
+#### Obsidian Web Clipper로 웹 클리핑하기
 
-1. Chrome 확장 프로그램 설치
-2. 설정에서 저장 폴더를 `raw/`로 지정
-3. 웹 페이지에서 확장 프로그램 아이콘 클릭 → 클리핑
+웹 페이지를 Markdown으로 바로 클리핑할 수 있는 공식 확장 프로그램입니다.
 
-클리핑된 파일이 자동으로 `raw/`에 들어가고, 컴파일 시 wiki article로 통합됩니다.
+**설치**: [Chrome 웹 스토어](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf) (Firefox, Safari, Edge도 지원)
+
+**설정**:
+
+1. 확장 프로그램 설치 후 설정(⚙) 클릭
+2. **Vault** 항목에서 LLM Wiki 폴더( Obsidian vault) 선택
+3. **기본 템플릿**의 저장 폴더를 `raw/`로 변경 (기본값은 `Clippings`)
+4. 템플릿에서 `{{content}}` 변수가 본문을 담당 — 필요시 frontmatter에 `title`, `source`, `tags` 등 추가 가능
+
+**사용법**:
+
+| 동작 | 방법 |
+|------|------|
+| 전체 페이지 클리핑 | 확장 프로그램 아이콘 클릭 → "Obsidian에 추가" |
+| 일부만 클리핑 | 펜 아이콘 클릭 → 원하는 텍스트 드래그로 하이라이트 → "Obsidian에 추가" |
+| 단축키로 빠른 클리핑 | `Ctrl+Shift+O` (기본값, 변경 가능) |
+
+클리핑된 Markdown 파일이 `raw/`에 저장되고, 컴파일 시 wiki article로 통합됩니다.
+
+**고급**: 특정 사이트별로 다른 템플릿을 적용하려면 설정 → **Smart Triggers**에서 URL 패턴별 규칙을 추가하세요.
 
 ### 3. 에이전트에게 컴파일 요청
 
